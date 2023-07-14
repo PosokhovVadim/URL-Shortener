@@ -10,7 +10,7 @@ import (
 
 type Config struct {
 	Env         string `yaml:"env" env-default:"local" env-required:"true"`
-	SroragePath string `yaml:"srorage_path" env-required:"true"`
+	SroragePath string `yaml:"storage_path" env-required:"true"`
 	HTTPServer  `yaml:"http_server"`
 }
 
@@ -21,7 +21,7 @@ type HTTPServer struct {
 }
 
 func MustLoad() *Config {
-	configPath := os.Getenv("config_path")
+	configPath := os.Getenv("CONFIG_PATH")
 	if configPath == "" {
 		log.Fatalf("CONFIG_PATH is empty")
 	}
