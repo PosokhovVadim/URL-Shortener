@@ -17,12 +17,18 @@ func main() {
 	logger := *logging.SetupLogger(cfg.Env)
 	_ = logger
 	//TODO: Implement storage: mongodb
-	db, err := mongodb.ConnectStorage(cfg.StoragePath)
-
+	db, err := mongodb.ConnectStorage(cfg.StoragePath, logger)
+	mongodb.GetCollections(db)
 	if err != nil {
-		//some to do
+		fmt.Println("Not succes connect into database", db.GetName())
+
 	}
-	fmt.Println("Succes connect into database", db)
+	//mongodb.GetCollections(db)
+
+	err = mongodb.CloseStorage(db)
+	if err != nil {
+	}
+
 	//TODO: Implement router: chi, "chi render"
 
 	//TODO: To run server:
