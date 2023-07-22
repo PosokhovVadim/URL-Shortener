@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"url-shortener/internal/config"
 	"url-shortener/internal/logging"
 	"url-shortener/internal/storage/mongodb"
@@ -10,6 +11,12 @@ import (
 func main() {
 	//DONE: Implement config: cleanenv
 
+	if err != nil {
+		os.Exit(1)
+	}
+}
+
+func run() error {
 	cfg := config.MustLoad()
 	fmt.Printf("cfg: %v\n", cfg)
 	//TODO: Implement logger: slog
@@ -20,7 +27,7 @@ func main() {
 	db, err := mongodb.ConnectStorage(cfg.StoragePath, logger)
 	mongodb.GetCollections(db)
 	if err != nil {
-		fmt.Println("Not succes connect into database", db.GetName())
+		return fmt.Errorf(err.Error())
 
 	}
 	//mongodb.GetCollections(db)
@@ -32,5 +39,5 @@ func main() {
 	//TODO: Implement router: chi, "chi render"
 
 	//TODO: To run server:
-
+	return nil
 }
