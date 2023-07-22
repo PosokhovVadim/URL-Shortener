@@ -35,7 +35,3 @@ func SetupLogger(env string) *Logger {
 	}
 	return &Logger{Logger: log.With("env", env)}
 }
-
-// func GetLogger() *slog.Logger {
-// 	return log
-// }

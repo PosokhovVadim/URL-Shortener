@@ -8,25 +8,28 @@ import (
 )
 
 func main() {
-	//DONE: Implement config: cleanenv
 
 	cfg := config.MustLoad()
 	fmt.Printf("cfg: %v\n", cfg)
-	//TODO: Implement logger: slog
 
 	logger := *logging.SetupLogger(cfg.Env)
 	_ = logger
+
 	//TODO: Implement storage: mongodb
 	db, err := mongodb.ConnectStorage(cfg.StoragePath, logger)
-	mongodb.GetCollections(db)
+	//mongodb.GetCollections(db)
 	if err != nil {
 		fmt.Println("Not succes connect into database", db.GetName())
 
 	}
-	//mongodb.GetCollections(db)
 
+	err = mongodb.InsertOneURL(db, "test", "T")
+	if err != nil {
+		///
+	}
 	err = mongodb.CloseStorage(db)
 	if err != nil {
+
 	}
 
 	//TODO: Implement router: chi, "chi render"
