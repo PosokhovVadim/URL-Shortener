@@ -5,6 +5,7 @@ import (
 	"net/http"
 	resp "url-shortener/internal/http-server/handlers/response"
 	"url-shortener/internal/lib/logger/sl"
+	"url-shortener/internal/lib/random"
 
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/render"
@@ -28,7 +29,6 @@ type URLSaver interface {
 	InsertOneURL(url, alias string) error
 	InsertManyURL(values map[string]string) error
 }
-
 
 func New(log *slog.Logger, urlSaver URLSaver) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -61,9 +61,8 @@ func New(log *slog.Logger, urlSaver URLSaver) http.HandlerFunc {
 
 		}
 
-
 		alias := req.Alias
-		if alias == "" { 
+		if alias == "" {
 			alias = random.RandomString(aliasLength)
 		}
 	}
