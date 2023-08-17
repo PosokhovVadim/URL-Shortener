@@ -6,11 +6,14 @@ import (
 	"url-shortener/internal/config"
 	"url-shortener/internal/logging"
 	"url-shortener/internal/storage/mongodb"
+
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 )
 
 func main() {
 
-	if err != nil {
+	if  run() != nil {
 		os.Exit(1)
 	}
 }
@@ -20,26 +23,22 @@ func run() error {
 	fmt.Printf("cfg: %v\n", cfg)
 
 	logger := *logging.SetupLogger(cfg.Env)
-	_ = logger
 
-	//TODO: Implement storage: mongodb
 	db, err := mongodb.ConnectStorage(cfg.StoragePath, logger)
-	//mongodb.GetCollections(db)
+	
+ 
 	if err != nil {
 		return fmt.Errorf(err.Error())
 
 	}
+	defer db.CloseStorage() 
 
-	err = mongodb.InsertOneURL(db, "test", "T")
-	if err != nil {
-		///
-	}
-	err = mongodb.CloseStorage(db)
-	if err != nil {
+	router := chi.NewRouter()
+	router.Use(middleware.RequestID)
 
-	}
+	//TODO: check thunder-tests (dont remeber pull it on gitignore) 
+	//middleware 
 
-	//TODO: Implement router: chi, "chi render"
 
 	//TODO: To run server:
 	return nil

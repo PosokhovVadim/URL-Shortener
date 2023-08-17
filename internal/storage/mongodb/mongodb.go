@@ -29,10 +29,10 @@ func isDuplicate(err error) error {
 	return nil
 }
 
-func InsertOneURL(db *Storage, url, alias string) error {
+func (s *Storage) InsertOneURL(url, alias string) error {
 	const fn = "storage.mongodb.InsertOneURL"
 
-	coll := db.db.Collection("URL")
+	coll := s.db.Collection("URL")
 
 	_, err := coll.InsertOne(context.Background(), bson.D{
 		{Key: "Url", Value: url},
@@ -40,7 +40,7 @@ func InsertOneURL(db *Storage, url, alias string) error {
 	})
 
 	if err != nil {
-		db.logger.Logger.Error(fmt.Sprintf("Insert error in func: %s", fn), sl.Err(err))
+		s.logger.Logger.Error(fmt.Sprintf("Insert error in func: %s", fn), sl.Err(err))
 		if dupErr := isDuplicate(err); dupErr != nil {
 			return fmt.Errorf("%w, %s", dupErr, fn)
 		}
@@ -51,10 +51,10 @@ func InsertOneURL(db *Storage, url, alias string) error {
 	return nil
 }
 
-func InsertManyURL(db *Storage, values map[string]string) error {
+func (s *Storage) InsertManyURL(values map[string]string) error {
 	const fn = "storage.mongodb.InsertManyURL"
 
-	coll := db.db.Collection("URL")
+	coll := s.db.Collection("URL")
 	docs := []interface{}{}
 	for key, val := range values {
 		docs = append(docs, bson.D{
@@ -65,7 +65,7 @@ func InsertManyURL(db *Storage, values map[string]string) error {
 
 	_, err := coll.InsertMany(context.Background(), docs)
 	if err != nil {
-		db.logger.Logger.Error(fmt.Sprintf("Insert error in func: %s", fn), sl.Err(err))
+		s.logger.Logger.Error(fmt.Sprintf("Insert error in func: %s", fn), sl.Err(err))
 		if dupErr := isDuplicate(err); dupErr != nil {
 			return fmt.Errorf("%w, %s", dupErr, fn)
 		}
@@ -76,10 +76,10 @@ func InsertManyURL(db *Storage, values map[string]string) error {
 
 }
 
-func SelectURL(db *Storage, alias string) (string, error) {
+func (s *Storage)SelectURL(alias string) (string, error) {
 	const fn = "storage.mongodb.SelectURL"
 
-	coll := db.db.Collection("URL")
+	coll := s.db.Collection("URL")
 
 	var url string
 	err := coll.FindOne(context.Background(), bson.D{
@@ -87,23 +87,23 @@ func SelectURL(db *Storage, alias string) (string, error) {
 	}).Decode(&url)
 
 	if err != nil {
-		db.logger.Logger.Error(fmt.Sprintf("Select error in func: %s", fn), sl.Err(err))
+		s.logger.Logger.Error(fmt.Sprintf("Select error in func: %s", fn), sl.Err(err))
 		return "", fmt.Errorf("%w, %s", err, fn)
 	}
 	return url, nil
 }
 
-func DeleteOneURL(db *Storage, alias string) error {
+func (s *Storage) DeleteOneURL(alias string) error {
 	const fn = "storage.mongodb.DeleteURL"
 
-	coll := db.db.Collection("URL")
+	coll := s.db.Collection("URL")
 
 	_, err := coll.DeleteOne(context.Background(), bson.D{
 		{Key: "Alias", Value: alias},
 	})
 
 	if err != nil {
-		db.logger.Logger.Error(fmt.Sprintf("Delete error in func: %s", fn), sl.Err(err))
+		s.logger.Logger.Error(fmt.Sprintf("Delete error in func: %s", fn), sl.Err(err))
 		return fmt.Errorf("%w, %s", err, fn)
 	}
 	return nil
@@ -136,17 +136,17 @@ func ConnectStorage(storagePath string, log logging.Logger) (*Storage, error) {
 
 }
 
-func CloseStorage(db *Storage) error {
+func (s *Storage) CloseStorage() error {
 	const fn = "storage.mongodb.CloseStorage"
 
-	err := db.db.Client().Disconnect(context.Background())
+	err := s.db.Client().Disconnect(context.Background())
 
 	if err != nil {
-		db.logger.Logger.Info(fmt.Sprintf("Disconnect error in func: %s", fn))
+		s.logger.Logger.Info(fmt.Sprintf("Disconnect error in func: %s", fn))
 		return fmt.Errorf("%w, %s", err, fn)
 	}
 
-	db.logger.Logger.Info("Database Disconnected")
+	s.logger.Logger.Info("Database Disconnected")
 
 	return nil
 
